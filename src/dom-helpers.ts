@@ -1,15 +1,22 @@
-import { Map } from './types';
+import { Map, Point } from './types';
+import { find } from 'lodash'
 
 const WAIT_BW_RENDERS = 150; // ms
 
-const drawMap = (map: Map) => {
+const drawMap = (map: Map, draftCells?: Point[]) => {
   let dom = '';
 
-  map.grid.map((row) => {
+  map.grid.map((row, y) => {
     dom += '<pre class="row">';
 
-    row.map((cell) => {
-      dom += `<span class="cell ${cell}">${cell[0]}</span>`;
+    row.map((cell, x) => {
+      let className = `cell ${cell}`
+      if (draftCells) {
+        const isInDraft = Boolean(find(draftCells, (cell) => { return cell.x === x && cell.y === y }))
+        if (isInDraft) className += ' draft'
+      }
+
+      dom += `<span id="${x}-${y}" class="${className}">${cell[0]}</span>`;
     });
 
     dom += '</pre>';
@@ -18,10 +25,10 @@ const drawMap = (map: Map) => {
   document.querySelector<HTMLDivElement>('#map')!.innerHTML = dom;
 };
 
-export const delayMap = (map: Map, waitMultiplier = 1): Promise<Map> => {
-  drawMap(map);
+export const drawMapWithDelay = (map: Map, draft?: Point[]): Promise<Map> => {
+  drawMap(map, draft);
 
-  return new Promise((resolve) => setTimeout(() => resolve(map), WAIT_BW_RENDERS * waitMultiplier));
+  return new Promise((resolve) => setTimeout(() => resolve(map), WAIT_BW_RENDERS));
 };
 
 export const disableGenerate = () => {
