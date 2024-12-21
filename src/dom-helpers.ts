@@ -3,6 +3,24 @@ import { find } from 'lodash'
 
 const WAIT_BW_RENDERS = 150; // ms
 
+const printJson = (map: Map) => {
+  let dom = '<table>'
+
+  dom += `<tr><td>Size</td><td>Width: ${map.width}, Height: ${map.height}</td></tr>`
+  dom += `<tr><td>Start direction</td><td>${map.startDirection}</td></tr>`
+  dom += `<tr><td>Start position</td><td>${JSON.stringify(map.startPosition)}</td></tr>`
+  dom += `<tr><td>Last direction</td><td>${map.lastDirection}</td></tr>`
+  dom += `<tr><td>Last position</td><td>${JSON.stringify(map.lastPosition)}</td></tr>`
+  dom += `<tr><td>Number of paths</td><td>${map.numberOfPaths}</td></tr>`
+  dom += `<tr><td>Failed drafts</td><td>${map.failedDrafts}</td></tr>`
+
+  dom += '</table>'
+
+  // dom += `<div><code>${JSON.stringify(map.grid)}</code></div>`
+
+  document.querySelector<HTMLDivElement>('#json')!.innerHTML = dom;
+}
+
 const drawMap = (map: Map, draftCells?: Point[]) => {
   let dom = '';
 
@@ -23,6 +41,8 @@ const drawMap = (map: Map, draftCells?: Point[]) => {
   });
 
   document.querySelector<HTMLDivElement>('#map')!.innerHTML = dom;
+
+  printJson(map);
 };
 
 export const drawMapWithDelay = (map: Map, draft?: Point[]): Promise<Map> => {

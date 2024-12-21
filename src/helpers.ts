@@ -1,8 +1,68 @@
-import { Direction, Map, Point } from './types';
-import { random } from 'lodash';
+import { Cell, Direction, Map, Point } from './types';
+import { last, random } from 'lodash';
 
-export const checkDraftMove = (map: Map, draftCells: Point[]) => {
-  // TODO:
+export const getHorizontal = (direction: Direction) => {
+  return (direction === Direction.east || direction === Direction.west)
+}
+
+export const getCellFromPoint = (map: Map, point: Point): Cell => {
+  const { grid } = map;
+  return grid[point.y][point.x]
+}
+
+export const setCellAtPoint = (map: Map, point: Point, cell: Cell): Map => {
+  const { grid } = map;
+  grid[point.y][point.x] = cell
+  return map
+}
+
+export const move = (map: Map, draftCells: Point[], direction: Direction) => {
+  // if the first cell was not the start, change it to vertical or horizontal
+  // change each cell travelled thru to horizontal or vertical, or - if it was already a path - change. it to an intersection
+  const isHorizontal = getHorizontal(direction)
+  const oppositeDirection = isHorizontal ? Cell.vertical : Cell.horizontal
+  for (let i = 0; i < draftCells.length; i++) {
+    const cellType = getCellFromPoint(map, draftCells[i]);
+    if (i === 0 && cellType === Cell.start) {
+      // do nothing
+    } else if (i === 0) {
+      setCellAtPoint(map, draftCells[i], Cell.turn)
+    } else if (cellType === oppositeDirection) {
+      // if this was already a path, now it's an intersection
+      setCellAtPoint(map, draftCells[i], Cell.intersection)
+    } else {
+      setCellAtPoint(map, draftCells[i], isHorizontal ? Cell.horizontal : Cell.vertical)
+    }
+  }
+
+  if (!map.startDirection) map.startDirection === direction
+  map.lastDirection === direction
+  map.lastPosition = last(draftCells)
+  map.numberOfPaths++
+}
+
+export const checkDraftMove = (map: Map, draftCells: Point[], isHorizontal: boolean): boolean => {
+  // ignore first cell: that's the starting cell
+  // cells between first and last should not be the start tile or a tile parallel to the direction
+  // the last cell needs to have been a wall
+
+  // last cell
+  if (getCellFromPoint(map, last(draftCells)!) !== Cell.wall) {
+    return false
+  }
+
+  // middle cells
+  for (let i = 1; i < draftCells.length - 1; i++) {
+    const cellType = getCellFromPoint(map, draftCells[i]);
+
+    if (cellType === Cell.intersection) return false
+    if (cellType === Cell.turn) return false
+    if (cellType === Cell.start) return false
+    if (cellType === Cell.horizontal && isHorizontal) return false
+    if (cellType === Cell.vertical && !isHorizontal) return false
+  }
+
+  return true  
 }
 
 const getPointAtDistanceAndDirection = (start: Point, distance: number, direction: Direction): Point => {

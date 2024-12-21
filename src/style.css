@@ -63,6 +63,10 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+button:disabled {
+  cursor: not-allowed;
+  border-width: 0px;
+}
 
 #map {
   background-color: #222;
@@ -74,7 +78,6 @@ button:focus-visible {
 }
 
 .cell {
-  border: 0px solid black;
   margin: 0px 4px;
 }
 
@@ -82,16 +85,16 @@ button:focus-visible {
   background-color: black;
   color: white;
 }
-.cell.vertical {
-  border-left-width: 1px;
-  border-right-width: 1px;
-}
-
-.cell.horizontal {
-  border-top-width: 1px;
-  border-bottom-width: 1px;
+.cell.vertical,
+.cell.horizontal,
+.cell.intersection,
+.cell.turn,
+.cell.start, 
+.cell.end {
+  background-color: lightgreen;
 }
 
 .cell.draft {
   background-color: goldenrod!important;
+  color: white;
 }

@@ -1,7 +1,8 @@
-export enum CellType {
+export enum Cell {
   vertical = 'vertical',
   horizontal = 'horizontal',
   intersection = 'intersection',
+  turn = 'turn',
   start = 'start',
   end = 'end',
   wall = 'wall',
@@ -9,7 +10,7 @@ export enum CellType {
 
 export type Point = { x: number, y: number }
 
-export type Row = CellType[];
+export type Row = Cell[];
 
 export type Grid = Row[];
 

@@ -7,19 +7,23 @@
 // once a certain number of draft moves have failed, end map creation
 
 import { disableGenerate, drawMapWithDelay, enableGenerate } from './dom-helpers';
-import { getDraftCells, getMaxDistanceInDirection, getRandomDirection } from './helpers';
-import { CellType, Map } from './types';
+import { checkDraftMove, getDraftCells, getHorizontal, getMaxDistanceInDirection, getRandomDirection, move, setCellAtPoint } from './helpers';
+import { Cell, Map } from './types';
 import { random, times } from 'lodash';
 
 const DEFAULT_MAP_WIDTH = 8;
 const DEFAULT_MAP_HEIGHT = 12;
+const MAX_FAILURES = 3;
 
 const finish = (map: Map) => {
+  // TODO: set cell at lastPosition to type 'end'
+
   enableGenerate();
 };
 
 const createDraftMove = (map: Map) => {
   const direction = getRandomDirection(map.lastDirection);
+  const isHorizontal = getHorizontal(direction)
   const maxDistance = getMaxDistanceInDirection(map, direction);
 
   if (maxDistance < 1) {
@@ -34,24 +38,36 @@ const createDraftMove = (map: Map) => {
 
   const draftCells = getDraftCells(map, direction, distance)
 
-  drawMapWithDelay(map, draftCells).then((map => {
+  drawMapWithDelay(map, draftCells).then(map => {
     // decide if draft works or not
+    // if the draft is valid, make that move
+    // if the draft is not valid, see if we've failed too many times
+    // if so, exit map creation
+    // if not, make a new draft move
+    const isDraftValid = checkDraftMove(map, draftCells, isHorizontal)
+    console.log(isDraftValid)
 
-    // if distance < 1, fail
+    if (isDraftValid) {
+      move(map, draftCells, direction)
 
-    // TODO: move this to next function
-    finish(map)
-  }))
+      drawMapWithDelay(map).then(map => {
+        // TODO: recurse
+        finish(map)
+      })
+    } else {
+      map.failedDrafts++
 
-  // if successful:
-  // map.startDirection = getRandomDirection();
-  // map.lastDirection = map.startDirection;
-  // map.lastPosition = [x, y]
-  // map.numberOfPaths++
+      if (map.failedDrafts > MAX_FAILURES) {
+        finish(map)
+      } else {
+        createDraftMove(map)
+      }
+    }
+  })
 }
 
 const createEmptyMap = (cols: number, rows: number) => {
-  const map = { grid: times(rows, () => times(cols, () => CellType.wall)), width: cols, height: rows, numberOfPaths: 0, failedDrafts: 0 };
+  const map = { grid: times(rows, () => times(cols, () => Cell.wall)), width: cols, height: rows, numberOfPaths: 0, failedDrafts: 0 };
   drawMapWithDelay(map).then((map) => {
     startPath(map);
   });
@@ -64,7 +80,7 @@ const startPath = (map: Map) => {
 
   map.startPosition = { x: startX, y: startY };
   map.lastPosition = { x: startX, y: startY };
-  grid[startY][startX] = CellType.start;
+  setCellAtPoint(map, { x: startX, y: startY }, Cell.start);
 
   // FIXME: this needs to be set later
   // map.startDirection = getRandomDirection();
