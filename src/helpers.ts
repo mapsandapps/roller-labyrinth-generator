@@ -35,8 +35,8 @@ export const move = (map: Map, draftCells: Point[], direction: Direction) => {
     }
   }
 
-  if (!map.startDirection) map.startDirection === direction
-  map.lastDirection === direction
+  if (!map.startDirection) map.startDirection = direction
+  map.lastDirection = direction
   map.lastPosition = last(draftCells)
   map.numberOfPaths++
 }

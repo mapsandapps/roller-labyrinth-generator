@@ -13,12 +13,14 @@ import { random, times } from 'lodash';
 
 const DEFAULT_MAP_WIDTH = 8;
 const DEFAULT_MAP_HEIGHT = 12;
-const MAX_FAILURES = 3;
+const MAX_FAILURES = 20;
 
 const finish = (map: Map) => {
-  // TODO: set cell at lastPosition to type 'end'
+  setCellAtPoint(map, map.lastPosition!, Cell.end)
 
-  enableGenerate();
+  drawMapWithDelay(map).then(() => {
+    enableGenerate();
+  })
 };
 
 const createDraftMove = (map: Map) => {
@@ -30,7 +32,12 @@ const createDraftMove = (map: Map) => {
     // throw this out without even bothering to draw it
     console.warn("draft move had distance 0; redrafting")
     map.failedDrafts++
-    createDraftMove(map)
+
+    if (map.failedDrafts >= MAX_FAILURES) {
+      finish(map)
+    } else {
+      createDraftMove(map)
+    }
     return
   }
 
@@ -38,6 +45,7 @@ const createDraftMove = (map: Map) => {
 
   const draftCells = getDraftCells(map, direction, distance)
 
+  // draw draft move
   drawMapWithDelay(map, draftCells).then(map => {
     // decide if draft works or not
     // if the draft is valid, make that move
@@ -45,19 +53,19 @@ const createDraftMove = (map: Map) => {
     // if so, exit map creation
     // if not, make a new draft move
     const isDraftValid = checkDraftMove(map, draftCells, isHorizontal)
-    console.log(isDraftValid)
 
     if (isDraftValid) {
       move(map, draftCells, direction)
 
+      // re-draw with draft move approved
       drawMapWithDelay(map).then(map => {
-        // TODO: recurse
-        finish(map)
+        // recurse
+        createDraftMove(map);
       })
     } else {
       map.failedDrafts++
 
-      if (map.failedDrafts > MAX_FAILURES) {
+      if (map.failedDrafts >= MAX_FAILURES) {
         finish(map)
       } else {
         createDraftMove(map)
@@ -81,10 +89,6 @@ const startPath = (map: Map) => {
   map.startPosition = { x: startX, y: startY };
   map.lastPosition = { x: startX, y: startY };
   setCellAtPoint(map, { x: startX, y: startY }, Cell.start);
-
-  // FIXME: this needs to be set later
-  // map.startDirection = getRandomDirection();
-  // map.lastDirection = map.startDirection;
 
   drawMapWithDelay(map).then((map) => {
     createDraftMove(map);

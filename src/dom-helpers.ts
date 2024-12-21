@@ -1,7 +1,7 @@
 import { Map, Point } from './types';
 import { find } from 'lodash'
 
-const WAIT_BW_RENDERS = 150; // ms
+const WAIT_BW_RENDERS = 500; // ms
 
 const printJson = (map: Map) => {
   let dom = '<table>'
