@@ -17,16 +17,15 @@ const createDraftMove = (map: Map) => {
     // decide if draft works or not
 
     // if distance < 1, fail
+
+    // TODO: move this to next function
+    finish(map)
   }))
 
   // if successful:
   // map.startDirection = getRandomDirection();
   // map.lastDirection = map.startDirection;
   // map.lastPosition = [x, y]
-
-  // drawMapWithDelay(map).then((map) => {
-  //   finish(map);
-  // });
 }
 
 const createEmptyMap = (cols: number, rows: number) => {
