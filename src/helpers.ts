@@ -1,6 +1,10 @@
 import { Direction, Map, Point } from './types';
 import { random } from 'lodash';
 
+export const checkDraftMove = (map: Map, draftCells: Point[]) => {
+  // TODO:
+}
+
 const getPointAtDistanceAndDirection = (start: Point, distance: number, direction: Direction): Point => {
   if (direction === Direction.north) {
     return { x: start.x, y: start.y - distance }
@@ -46,8 +50,19 @@ export const getMaxDistanceInDirection = (map: Map, direction: Direction): numbe
   } 
 }
 
-export const getRandomDirection = (): Direction => {
-  const directionOptions = Object.values(Direction);
+export const getRandomDirection = (lastDirection?: Direction): Direction => {
+  // at the start, go in any direction
+  // for subsequent moves, go perpendicular to the previous direction of travel
+  // theoretically, we could let it continue in the last direction, but i don't want to
+
+  let directionOptions;
+  if (lastDirection === Direction.north || lastDirection === Direction.south) {
+    directionOptions = [Direction.east, Direction.west]
+  } else if (lastDirection === Direction.east || lastDirection === Direction.west) {
+    directionOptions = [Direction.north, Direction.south]
+  } else {
+    directionOptions = Object.values(Direction)
+  }
 
   return directionOptions[random(directionOptions.length - 1)];
 };

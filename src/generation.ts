@@ -1,3 +1,11 @@
+// a) pick a random starting point
+// b) pick a random direction (that isn't the one you were just moving in, if that's relevant)
+// c) calculate the distance to the outside
+// d) pick a distance to move in that direction (random b/w 1 and b)
+// e) see if the tile you'd land on is acceptable and no intervening tiles are already going that direction, if so move
+// f) if not, maybe just start over from b
+// once a certain number of draft moves have failed, end map creation
+
 import { disableGenerate, drawMapWithDelay, enableGenerate } from './dom-helpers';
 import { getDraftCells, getMaxDistanceInDirection, getRandomDirection } from './helpers';
 import { CellType, Map } from './types';
@@ -11,12 +19,13 @@ const finish = (map: Map) => {
 };
 
 const createDraftMove = (map: Map) => {
-  const direction = getRandomDirection();
+  const direction = getRandomDirection(map.lastDirection);
   const maxDistance = getMaxDistanceInDirection(map, direction);
 
   if (maxDistance < 1) {
     // throw this out without even bothering to draw it
     console.warn("draft move had distance 0; redrafting")
+    map.failedDrafts++
     createDraftMove(map)
     return
   }
@@ -38,10 +47,11 @@ const createDraftMove = (map: Map) => {
   // map.startDirection = getRandomDirection();
   // map.lastDirection = map.startDirection;
   // map.lastPosition = [x, y]
+  // map.numberOfPaths++
 }
 
 const createEmptyMap = (cols: number, rows: number) => {
-  const map = { grid: times(rows, () => times(cols, () => CellType.wall)), width: cols, height: rows };
+  const map = { grid: times(rows, () => times(cols, () => CellType.wall)), width: cols, height: rows, numberOfPaths: 0, failedDrafts: 0 };
   drawMapWithDelay(map).then((map) => {
     startPath(map);
   });
