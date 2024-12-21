@@ -64,13 +64,18 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+#map {
+  background-color: #222;
+  padding: 24px 0px;
+}
+
 .row {
   margin: 0px;
 }
 
 .cell {
   border: 0px solid black;
-  margin: 0px;
+  margin: 0px 4px;
 }
 
 .cell.wall {

@@ -3,13 +3,25 @@ import { getDraftCells, getMaxDistanceInDirection, getRandomDirection } from './
 import { CellType, Map } from './types';
 import { random, times } from 'lodash';
 
+const DEFAULT_MAP_WIDTH = 8;
+const DEFAULT_MAP_HEIGHT = 12;
+
 const finish = (map: Map) => {
   enableGenerate();
 };
 
 const createDraftMove = (map: Map) => {
   const direction = getRandomDirection();
-  const distance = random(getMaxDistanceInDirection(map, direction))
+  const maxDistance = getMaxDistanceInDirection(map, direction);
+
+  if (maxDistance < 1) {
+    // throw this out without even bothering to draw it
+    console.warn("draft move had distance 0; redrafting")
+    createDraftMove(map)
+    return
+  }
+
+  const distance = random(1, maxDistance)
 
   const draftCells = getDraftCells(map, direction, distance)
 
@@ -55,5 +67,5 @@ const startPath = (map: Map) => {
 
 export const generateLevel = () => {
   disableGenerate();
-  createEmptyMap(6, 5);
+  createEmptyMap(DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT);
 };
