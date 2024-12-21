@@ -1,5 +1,4 @@
 import { Map } from './types';
-import { delay } from 'lodash';
 
 const WAIT_BW_RENDERS = 150; // ms
 
@@ -19,7 +18,7 @@ const drawMap = (map: Map) => {
   document.querySelector<HTMLDivElement>('#map')!.innerHTML = dom;
 };
 
-export const delayMap = (map: Map, waitMultiplier = 1) => {
+export const delayMap = (map: Map, waitMultiplier = 1): Promise<Map> => {
   drawMap(map);
 
   return new Promise((resolve) => setTimeout(() => resolve(map), WAIT_BW_RENDERS * waitMultiplier));

@@ -3,18 +3,18 @@ import { getRandomDirection } from './helpers';
 import { CellType, Map } from './types';
 import { random, times } from 'lodash';
 
-const finish = (map: Map): Map => {
+const finish = (map: Map) => {
   enableGenerate();
 };
 
-const createEmptyMap = (cols: number, rows: number): Map => {
+const createEmptyMap = (cols: number, rows: number) => {
   const map = { grid: times(rows, () => times(cols, () => CellType.wall)) };
   delayMap(map).then((map) => {
     startPath(map);
   });
 };
 
-const startPath = (map: Map): Map => {
+const startPath = (map: Map) => {
   const { grid } = map;
   const startX = random(0, grid[0].length - 1);
   const startY = random(0, grid.length - 1);
