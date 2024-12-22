@@ -61,13 +61,9 @@ const getPointAtDistanceAndDirection = (start: Point, distance: number, directio
 export const getDraftCells = (map: Map, direction: Direction, distance: number): Point[] => {
   const draftCells: Point[] = []
 
-  console.log(`DISTANCE: ${distance}`)
-
   for (let i = 0; i <= distance; i++) {
     draftCells.push(getPointAtDistanceAndDirection(map.lastPosition!, i, direction))    
   }
-
-  console.log(draftCells)
 
   return draftCells
 }

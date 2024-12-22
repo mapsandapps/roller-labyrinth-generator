@@ -70,7 +70,6 @@ const createDraftMove = (map: Map) => {
 
   if (maxDistance < 1) {
     // throw this out without even bothering to draw it
-    console.warn("draft move had distance 0; redrafting")
     map.failedDrafts++
 
     if (map.failedDrafts >= MAX_FAILURES) {
