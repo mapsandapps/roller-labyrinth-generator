@@ -4,25 +4,33 @@ import { Cell, Direction, Map, Point } from './types';
 import { find, repeat, toNumber, toString } from 'lodash'
 
 const DEFAULT_WAIT_BW_RENDERS = 200; // ms
-const IS_MAZE = true;
+const DEFAULT_IS_MAZE = false;
 const MAX_WAIT = 3000;
 const TILESET = 'labyrinth'
 const SHOULD_DRAW_BORDER = true; // add a border of "wall" cells around the whole sprite map
 
 let waitBetweenRenders = DEFAULT_WAIT_BW_RENDERS
+let isMaze = DEFAULT_IS_MAZE
 
 export const setDefaultFormValues = () => {
   document.querySelector<HTMLInputElement>('#speed')!.value = toString(MAX_WAIT - DEFAULT_WAIT_BW_RENDERS)
   document.querySelector<HTMLInputElement>('#speed')!.max = toString(MAX_WAIT)
   document.querySelector<HTMLInputElement>('#columns')!.value = toString(DEFAULT_MAP_WIDTH)
   document.querySelector<HTMLInputElement>('#rows')!.value = toString(DEFAULT_MAP_HEIGHT)
+  if (DEFAULT_IS_MAZE) {
+    document.querySelector<HTMLInputElement>('input[name="type"][value="maze"')!.checked = true
+  } else {
+    document.querySelector<HTMLInputElement>('input[name="type"][value="labyrinth"')!.checked = true
+  }
 }
 
 export const getFormValues = () => {
   const sliderValue = document.querySelector<HTMLInputElement>('#speed')!.value
   const speed = MAX_WAIT - toNumber(sliderValue);
   waitBetweenRenders = speed;
+  isMaze = document.querySelector<HTMLInputElement>('input[name="type"]:checked')!.value === 'maze'
   return {
+    isMaze,
     speed,
     columns: toNumber(document.querySelector<HTMLInputElement>('#columns')!.value) || DEFAULT_MAP_WIDTH,
     rows: toNumber(document.querySelector<HTMLInputElement>('#rows')!.value) || DEFAULT_MAP_HEIGHT
@@ -42,7 +50,7 @@ const getTileImg = (map: Map, cell: Cell) => {
   const { lastDirection, startDirection } = map;
   if (cell === Cell.wall) return `<img src="/${TILESET}/solid.png">`
 
-  if (IS_MAZE) {
+  if (isMaze) {
     return `<img src="/${TILESET}/tunnel.png">`
   } else {
     if (cell === Cell.start) return `<img src="/${TILESET}/${getStartTile(startDirection!)}.png">`

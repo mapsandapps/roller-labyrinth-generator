@@ -15,20 +15,42 @@
         <div id="map"></div>
 
         <form>
-          <label>
-            Generation speed
-            <input id="speed" type="range" min="0" max="3000" />
-          </label>
-          <br />
-          <label>
-            Columns
-            <input id="columns" type="number" min="0" step="1" maxlength="2" />
-          </label>
-          <br />
-          <label>
-            Rows
-            <input id="rows" type="number" min="0" step="1" maxlength="2" />
-          </label>
+          <div>
+            <label>
+              Generation speed
+              <input id="speed" type="range" min="0" max="3000" />
+            </label>
+          </div>
+          <div>
+            <label>
+              Columns
+              <input id="columns" type="number" min="0" step="1" maxlength="2" />
+            </label>
+          </div>
+          <div>
+            <label>
+              Rows
+              <input id="rows" type="number" min="0" step="1" maxlength="2" />
+            </label>
+          </div>
+          <fieldset>
+            <legend>Type of map:</legend>
+          
+            <div>
+              <label>
+                Labyrinth
+                <input type="radio" id="labyrinth" name="type" value="labyrinth" checked />
+              </label>
+            </div>
+          
+            <div>
+              <label>
+                Maze
+                <input type="radio" id="maze" name="type" value="maze" />
+              </label>
+            </div>
+          </fieldset>
+          
         </form>
         <button id="generate">Generate</button>
 
