@@ -23,43 +23,6 @@ export const getOppositeDirection = (direction: Direction): Direction => {
   return Direction.north
 }
 
-export const move = (map: Map, draftCells: Point[], direction: Direction) => {
-  // if the first cell was not the start, change it to vertical or horizontal
-  // change each cell travelled thru to horizontal or vertical, or - if it was already a path - change. it to an intersection
-  const isHorizontal = getHorizontal(direction)
-  const oppositeDirection = isHorizontal ? Cell.vertical : Cell.horizontal
-  for (let i = 0; i < draftCells.length; i++) {
-    const cellType = getCellFromPoint(map, draftCells[i]);
-    if (i === 0 && cellType === Cell.start) {
-      // do nothing
-    } else if (i === 0) {
-      let cellType = Cell.turnNW
-
-      if ((map.lastDirection === Direction.west && direction === Direction.north) ||
-        (map.lastDirection === Direction.south && direction === Direction.east)) {
-        cellType = Cell.turnNE
-      } else if ((map.lastDirection === Direction.north && direction === Direction.east) ||
-        (map.lastDirection === Direction.west && direction === Direction.south)) {
-        cellType = Cell.turnES
-      } else if ((map.lastDirection === Direction.north && direction === Direction.west) ||
-        (map.lastDirection === Direction.east && direction === Direction.south)) {
-        cellType = Cell.turnSW
-      }
-      setCellAtPoint(map, draftCells[i], cellType)
-    } else if (cellType === oppositeDirection) {
-      // if this was already a path, now it's an intersection
-      setCellAtPoint(map, draftCells[i], Cell.intersection)
-    } else {
-      setCellAtPoint(map, draftCells[i], isHorizontal ? Cell.horizontal : Cell.vertical)
-    }
-  }
-
-  if (!map.startDirection) map.startDirection = direction
-  map.lastDirection = direction
-  map.lastPosition = last(draftCells)
-  map.numberOfPaths++
-}
-
 export const checkDraftMove = (map: Map, draftCells: Point[], isHorizontal: boolean): boolean => {
   // ignore first cell: that's the starting cell
   // cells between first and last should not be the start tile or a tile parallel to the direction

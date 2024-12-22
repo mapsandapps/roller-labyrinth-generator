@@ -55,6 +55,7 @@ const printJson = (map: Map) => {
   dom += `<tr><td>Last direction</td><td>${map.lastDirection}</td></tr>`
   dom += `<tr><td>Last position</td><td>${JSON.stringify(map.lastPosition)}</td></tr>`
   dom += `<tr><td>Number of paths</td><td>${map.numberOfPaths}</td></tr>`
+  dom += `<tr><td>Total path length</td><td>${map.totalPathLength}</td></tr>`
   dom += `<tr><td>Failed drafts</td><td>${map.failedDrafts}</td></tr>`
 
   dom += '</table>'

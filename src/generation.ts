@@ -7,12 +7,12 @@
 // once a certain number of draft moves have failed, end map creation
 
 import { clearMapWithSprites, disableGenerate, drawMapWithDelay, drawMapWithSprites, enableGenerate } from './dom-helpers';
-import { checkDraftMove, getDraftCells, getHorizontal, getMaxDistanceInDirection, getRandomDirection, move, setCellAtPoint } from './helpers';
-import { Cell, Map } from './types';
-import { random, times } from 'lodash';
+import { checkDraftMove, getCellFromPoint, getDraftCells, getHorizontal, getMaxDistanceInDirection, getRandomDirection, setCellAtPoint } from './helpers';
+import { Cell, Direction, Map, Point } from './types';
+import { last, random, times } from 'lodash';
 
 const DEFAULT_MAP_WIDTH = 8;
-const DEFAULT_MAP_HEIGHT = 12;
+const DEFAULT_MAP_HEIGHT = 5;
 const MAX_FAILURES = 20;
 
 const finish = (map: Map) => {
@@ -23,6 +23,45 @@ const finish = (map: Map) => {
     enableGenerate();
   })
 };
+
+const move = (map: Map, draftCells: Point[], direction: Direction) => {
+  // if the first cell was not the start, change it to vertical or horizontal
+  // change each cell travelled thru to horizontal or vertical, or - if it was already a path - change. it to an intersection
+  const isHorizontal = getHorizontal(direction)
+  const oppositeDirection = isHorizontal ? Cell.vertical : Cell.horizontal
+  for (let i = 0; i < draftCells.length; i++) {
+    const cellType = getCellFromPoint(map, draftCells[i]);
+    if (i === 0 && cellType === Cell.start) {
+      // do nothing
+    } else if (i === 0) {
+      let cellType = Cell.turnNW
+
+      if ((map.lastDirection === Direction.west && direction === Direction.north) ||
+        (map.lastDirection === Direction.south && direction === Direction.east)) {
+        cellType = Cell.turnNE
+      } else if ((map.lastDirection === Direction.north && direction === Direction.east) ||
+        (map.lastDirection === Direction.west && direction === Direction.south)) {
+        cellType = Cell.turnES
+      } else if ((map.lastDirection === Direction.north && direction === Direction.west) ||
+        (map.lastDirection === Direction.east && direction === Direction.south)) {
+        cellType = Cell.turnSW
+      }
+      setCellAtPoint(map, draftCells[i], cellType)
+    } else if (cellType === oppositeDirection) {
+      // if this was already a path, now it's an intersection
+      setCellAtPoint(map, draftCells[i], Cell.intersection)
+    } else {
+      setCellAtPoint(map, draftCells[i], isHorizontal ? Cell.horizontal : Cell.vertical)
+    }
+
+    if (i !== 0) map.totalPathLength++
+  }
+
+  if (!map.startDirection) map.startDirection = direction
+  map.lastDirection = direction
+  map.lastPosition = last(draftCells)
+  map.numberOfPaths++
+}
 
 const createDraftMove = (map: Map) => {
   const direction = getRandomDirection(map.lastDirection);
@@ -76,7 +115,14 @@ const createDraftMove = (map: Map) => {
 }
 
 const createEmptyMap = (cols: number, rows: number) => {
-  const map = { grid: times(rows, () => times(cols, () => Cell.wall)), width: cols, height: rows, numberOfPaths: 0, failedDrafts: 0 };
+  const map = { 
+    grid: times(rows, () => times(cols, () => Cell.wall)), 
+    width: cols, 
+    height: rows, 
+    numberOfPaths: 0, 
+    failedDrafts: 0,
+    totalPathLength: 0
+  };
   drawMapWithDelay(map).then((map) => {
     startPath(map);
   });
@@ -89,6 +135,7 @@ const startPath = (map: Map) => {
 
   map.startPosition = { x: startX, y: startY };
   map.lastPosition = { x: startX, y: startY };
+  map.totalPathLength = 1;
   setCellAtPoint(map, { x: startX, y: startY }, Cell.start);
 
   drawMapWithDelay(map).then((map) => {

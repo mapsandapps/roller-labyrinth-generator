@@ -2,7 +2,6 @@ export enum Cell {
   horizontal = 'horizontal',
   vertical = 'vertical',
   intersection = 'intersection',
-  // turn = 'turn',
   turnNE = 'turn-ne',
   turnES = 'turn-es',
   turnSW = 'turn-sw',
@@ -28,6 +27,7 @@ export type Map = {
   lastPosition?: Point;
   numberOfPaths: number;
   failedDrafts: number;
+  totalPathLength: number;
 };
 
 export enum Direction {
