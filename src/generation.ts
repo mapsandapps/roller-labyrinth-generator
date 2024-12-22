@@ -6,7 +6,7 @@
 // f) if not, maybe just start over from b
 // once a certain number of draft moves have failed, end map creation
 
-import { clearMapWithSprites, disableGenerate, drawMapWithDelay, drawMapWithSprites, enableGenerate, getFormValues } from './dom-helpers';
+import { clearMapWithSprites, disableGenerate, drawMapWithDelay, enableGenerate, getFormValues } from './dom-helpers';
 import { checkDraftMove, getCellFromPoint, getDraftCells, getHorizontal, getMaxDistanceInDirection, getRandomDirection, setCellAtPoint, trimMap } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
 import { last, random, times } from 'lodash';
@@ -21,7 +21,6 @@ const finish = (map: Map) => {
   map = trimMap(map)
 
   drawMapWithDelay(map).then(() => {
-    drawMapWithSprites(map);
     enableGenerate();
   })
 };

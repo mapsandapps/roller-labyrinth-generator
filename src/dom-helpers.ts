@@ -28,7 +28,8 @@ export const getFormValues = () => {
 }
 
 const getStartTile = (startDirection: Direction) => {
-  return startDirection[0]
+  // when the map is first initialized, there's no startDirection yet
+  return startDirection ? startDirection[0] : 'n'
 }
 
 const getEndTile = (lastDirection: Direction) => {
@@ -54,7 +55,7 @@ export const clearMapWithSprites = () => {
 }
 
 export const drawMapWithSprites = (map: Map) => {
-  const { grid, height, width } = map;
+  const { grid, width } = map;
   let dom = ''
 
   if (SHOULD_DRAW_BORDER) dom += '<div>' + repeat(getTileImg(map, Cell.wall), width + 2) + '</div>'
@@ -119,6 +120,9 @@ const drawMap = (map: Map, draftCells?: Point[]) => {
 
 export const drawMapWithDelay = (map: Map, draft?: Point[]): Promise<Map> => {
   drawMap(map, draft);
+
+  // draw map with sprites, but only when the move is made, not when it's in draft
+  if (!draft) drawMapWithSprites(map);
 
   return new Promise((resolve) => setTimeout(() => resolve(map), waitBetweenRenders));
 };
