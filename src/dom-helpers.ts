@@ -1,11 +1,12 @@
 import { DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT } from './generation';
 import { getOppositeDirection } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
-import { find, toNumber, toString } from 'lodash'
+import { find, repeat, toNumber, toString } from 'lodash'
 
 const DEFAULT_WAIT_BW_RENDERS = 0; // ms // TODO: reset to 200ish
 const MAX_WAIT = 3000;
-const TILESET = 'labyrinth'
+const TILESET = 'labyrinth2'
+const SHOULD_DRAW_BORDER = true; // add a border of "wall" cells around the whole sprite map
 
 let waitBetweenRenders = DEFAULT_WAIT_BW_RENDERS
 
@@ -53,16 +54,22 @@ export const clearMapWithSprites = () => {
 }
 
 export const drawMapWithSprites = (map: Map) => {
-  const { grid } = map;
+  const { grid, height, width } = map;
   let dom = ''
+
+  if (SHOULD_DRAW_BORDER) dom += '<div>' + repeat(getTileImg(map, Cell.wall), width + 2) + '</div>'
 
   grid.map(row => {
     dom += '<div>'
+    if (SHOULD_DRAW_BORDER) dom += getTileImg(map, Cell.wall)
     row.map(cell => {
       dom += getTileImg(map, cell)
     })
+    if (SHOULD_DRAW_BORDER) dom += getTileImg(map, Cell.wall)
     dom += '</div>'
   })
+
+  if (SHOULD_DRAW_BORDER) dom += '<div>' + repeat(getTileImg(map, Cell.wall), width + 2) + '</div>'
 
   document.querySelector<HTMLDivElement>('#sprites')!.innerHTML = dom;
 }
