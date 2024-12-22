@@ -26,8 +26,8 @@ export type Map = {
   startPosition?: Point;
   lastPosition?: Point;
   numberOfPaths: number;
-  failedDrafts: number;
   totalPathLength: number;
+  failedDrafts: number;
 };
 
 export enum Direction {

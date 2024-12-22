@@ -1,9 +1,30 @@
+import { DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT } from './generation';
 import { getOppositeDirection } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
-import { find } from 'lodash'
+import { find, toNumber, toString } from 'lodash'
 
-const WAIT_BW_RENDERS = 200; // ms
+const DEFAULT_WAIT_BW_RENDERS = 200; // ms
+const MAX_WAIT = 3000;
 const TILESET = 'labyrinth'
+
+let waitBetweenRenders = DEFAULT_WAIT_BW_RENDERS
+
+export const setDefaultFormValues = () => {
+  document.querySelector<HTMLInputElement>('#speed')!.value = toString(MAX_WAIT - DEFAULT_WAIT_BW_RENDERS)
+  document.querySelector<HTMLInputElement>('#speed')!.max = toString(MAX_WAIT)
+  document.querySelector<HTMLInputElement>('#columns')!.value = toString(DEFAULT_MAP_WIDTH)
+  document.querySelector<HTMLInputElement>('#rows')!.value = toString(DEFAULT_MAP_HEIGHT)
+}
+
+export const getFormValues = () => {
+  const speed = MAX_WAIT - toNumber(document.querySelector<HTMLInputElement>('#speed')!.value) || DEFAULT_WAIT_BW_RENDERS;
+  waitBetweenRenders = speed;
+  return {
+    speed,
+    columns: toNumber(document.querySelector<HTMLInputElement>('#columns')!.value) || DEFAULT_MAP_WIDTH,
+    rows: toNumber(document.querySelector<HTMLInputElement>('#rows')!.value) || DEFAULT_MAP_HEIGHT
+  }
+}
 
 const getStartTile = (startDirection: Direction) => {
   return startDirection[0]
@@ -92,13 +113,19 @@ const drawMap = (map: Map, draftCells?: Point[]) => {
 export const drawMapWithDelay = (map: Map, draft?: Point[]): Promise<Map> => {
   drawMap(map, draft);
 
-  return new Promise((resolve) => setTimeout(() => resolve(map), WAIT_BW_RENDERS));
+  return new Promise((resolve) => setTimeout(() => resolve(map), waitBetweenRenders));
 };
 
 export const disableGenerate = () => {
+  document.querySelector<HTMLButtonElement>('#speed')!.disabled = true;
+  document.querySelector<HTMLButtonElement>('#columns')!.disabled = true;
+  document.querySelector<HTMLButtonElement>('#rows')!.disabled = true;
   document.querySelector<HTMLButtonElement>('#generate')!.disabled = true;
 };
 
 export const enableGenerate = () => {
+  document.querySelector<HTMLButtonElement>('#speed')!.disabled = false;
+  document.querySelector<HTMLButtonElement>('#columns')!.disabled = false;
+  document.querySelector<HTMLButtonElement>('#rows')!.disabled = false;
   document.querySelector<HTMLButtonElement>('#generate')!.disabled = false;
 };

@@ -6,13 +6,13 @@
 // f) if not, maybe just start over from b
 // once a certain number of draft moves have failed, end map creation
 
-import { clearMapWithSprites, disableGenerate, drawMapWithDelay, drawMapWithSprites, enableGenerate } from './dom-helpers';
+import { clearMapWithSprites, disableGenerate, drawMapWithDelay, drawMapWithSprites, enableGenerate, getFormValues } from './dom-helpers';
 import { checkDraftMove, getCellFromPoint, getDraftCells, getHorizontal, getMaxDistanceInDirection, getRandomDirection, setCellAtPoint } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
 import { last, random, times } from 'lodash';
 
-const DEFAULT_MAP_WIDTH = 8;
-const DEFAULT_MAP_HEIGHT = 5;
+export const DEFAULT_MAP_WIDTH = 8;
+export const DEFAULT_MAP_HEIGHT = 12;
 const MAX_FAILURES = 20;
 
 const finish = (map: Map) => {
@@ -144,7 +144,8 @@ const startPath = (map: Map) => {
 };
 
 export const generateLevel = () => {
+  const { columns, rows } = getFormValues()
   disableGenerate();
   clearMapWithSprites();
-  createEmptyMap(DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT);
+  createEmptyMap(columns, rows);
 };
