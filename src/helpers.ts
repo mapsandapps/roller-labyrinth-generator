@@ -16,6 +16,13 @@ export const setCellAtPoint = (map: Map, point: Point, cell: Cell): Map => {
   return map
 }
 
+export const getOppositeDirection = (direction: Direction): Direction => {
+  if (direction === Direction.north) return Direction.south
+  if (direction === Direction.east) return Direction.west
+  if (direction === Direction.west) return Direction.east
+  return Direction.north
+}
+
 export const move = (map: Map, draftCells: Point[], direction: Direction) => {
   // if the first cell was not the start, change it to vertical or horizontal
   // change each cell travelled thru to horizontal or vertical, or - if it was already a path - change. it to an intersection
@@ -26,7 +33,19 @@ export const move = (map: Map, draftCells: Point[], direction: Direction) => {
     if (i === 0 && cellType === Cell.start) {
       // do nothing
     } else if (i === 0) {
-      setCellAtPoint(map, draftCells[i], Cell.turn)
+      let cellType = Cell.turnNW
+
+      if ((map.lastDirection === Direction.west && direction === Direction.north) ||
+        (map.lastDirection === Direction.south && direction === Direction.east)) {
+        cellType = Cell.turnNE
+      } else if ((map.lastDirection === Direction.north && direction === Direction.east) ||
+        (map.lastDirection === Direction.west && direction === Direction.south)) {
+        cellType = Cell.turnES
+      } else if ((map.lastDirection === Direction.north && direction === Direction.west) ||
+        (map.lastDirection === Direction.east && direction === Direction.south)) {
+        cellType = Cell.turnSW
+      }
+      setCellAtPoint(map, draftCells[i], cellType)
     } else if (cellType === oppositeDirection) {
       // if this was already a path, now it's an intersection
       setCellAtPoint(map, draftCells[i], Cell.intersection)
@@ -55,9 +74,8 @@ export const checkDraftMove = (map: Map, draftCells: Point[], isHorizontal: bool
   for (let i = 1; i < draftCells.length - 1; i++) {
     const cellType = getCellFromPoint(map, draftCells[i]);
 
-    if (cellType === Cell.intersection) return false
-    if (cellType === Cell.turn) return false
-    if (cellType === Cell.start) return false
+    if (cellType !== Cell.wall && cellType !== Cell.horizontal && cellType !== Cell.vertical) return false
+
     if (cellType === Cell.horizontal && isHorizontal) return false
     if (cellType === Cell.vertical && !isHorizontal) return false
   }

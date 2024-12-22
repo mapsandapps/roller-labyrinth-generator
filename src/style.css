@@ -79,22 +79,23 @@ button:disabled {
 
 .cell {
   margin: 0px 4px;
+  background-color: lightgreen;
 }
 
 .cell.wall {
   background-color: black;
   color: white;
 }
-.cell.vertical,
-.cell.horizontal,
-.cell.intersection,
-.cell.turn,
-.cell.start, 
-.cell.end {
-  background-color: lightgreen;
-}
 
 .cell.draft {
   background-color: goldenrod!important;
   color: white;
+}
+
+#sprites div {
+  height: 32px;
+}
+
+#sprites img {
+  width: 32px;
 }

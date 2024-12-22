@@ -1,7 +1,50 @@
-import { Map, Point } from './types';
+import { getOppositeDirection } from './helpers';
+import { Cell, Direction, Map, Point } from './types';
 import { find } from 'lodash'
 
-const WAIT_BW_RENDERS = 500; // ms
+const WAIT_BW_RENDERS = 200; // ms
+const TILESET = 'labyrinth'
+
+const getStartTile = (startDirection: Direction) => {
+  return startDirection[0]
+}
+
+const getEndTile = (lastDirection: Direction) => {
+  return getOppositeDirection(lastDirection)[0]
+}
+
+const getTileImg = (map: Map, cell: Cell) => {
+  const { lastDirection, startDirection } = map;
+  if (cell === Cell.wall) return `<img src="/${TILESET}/solid.png">`
+  if (cell === Cell.start) return `<img src="/${TILESET}/${getStartTile(startDirection!)}.png">`
+  if (cell === Cell.end) return `<img src="/${TILESET}/${getEndTile(lastDirection!)}.png">`
+  if (cell === Cell.horizontal) return `<img src="/${TILESET}/ew.png">`
+  if (cell === Cell.vertical) return `<img src="/${TILESET}/ns.png">`
+  if (cell === Cell.intersection) return `<img src="/${TILESET}/nesw.png">`
+  const [ cellType, directions ] = cell.split('-')
+  if (cellType === 'turn') {
+    return `<img src="/${TILESET}/${directions}.png">`
+  }
+}
+
+export const clearMapWithSprites = () => {
+  document.querySelector<HTMLDivElement>('#sprites')!.innerHTML = '';
+}
+
+export const drawMapWithSprites = (map: Map) => {
+  const { grid } = map;
+  let dom = ''
+
+  grid.map(row => {
+    dom += '<div>'
+    row.map(cell => {
+      dom += getTileImg(map, cell)
+    })
+    dom += '</div>'
+  })
+
+  document.querySelector<HTMLDivElement>('#sprites')!.innerHTML = dom;
+}
 
 const printJson = (map: Map) => {
   let dom = '<table>'
