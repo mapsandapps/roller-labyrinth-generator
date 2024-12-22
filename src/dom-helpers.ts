@@ -1,9 +1,9 @@
 import { DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT } from './generation';
 import { getOppositeDirection } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
-import { find, repeat, toNumber, toString } from 'lodash'
+import { find, isNumber, repeat, toNumber, toString } from 'lodash'
 
-const DEFAULT_WAIT_BW_RENDERS = 0; // ms // TODO: reset to 200ish
+const DEFAULT_WAIT_BW_RENDERS = 200; // ms
 const MAX_WAIT = 3000;
 const TILESET = 'labyrinth2'
 const SHOULD_DRAW_BORDER = true; // add a border of "wall" cells around the whole sprite map
@@ -18,7 +18,8 @@ export const setDefaultFormValues = () => {
 }
 
 export const getFormValues = () => {
-  const speed = MAX_WAIT - toNumber(document.querySelector<HTMLInputElement>('#speed')!.value) || DEFAULT_WAIT_BW_RENDERS;
+  const sliderValue = document.querySelector<HTMLInputElement>('#speed')!.value
+  const speed = MAX_WAIT - toNumber(sliderValue);
   waitBetweenRenders = speed;
   return {
     speed,
