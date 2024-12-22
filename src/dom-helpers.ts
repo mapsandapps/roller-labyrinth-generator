@@ -1,11 +1,12 @@
 import { DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT } from './generation';
 import { getOppositeDirection } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
-import { find, isNumber, repeat, toNumber, toString } from 'lodash'
+import { find, repeat, toNumber, toString } from 'lodash'
 
 const DEFAULT_WAIT_BW_RENDERS = 200; // ms
+const IS_MAZE = true;
 const MAX_WAIT = 3000;
-const TILESET = 'labyrinth2'
+const TILESET = 'labyrinth'
 const SHOULD_DRAW_BORDER = true; // add a border of "wall" cells around the whole sprite map
 
 let waitBetweenRenders = DEFAULT_WAIT_BW_RENDERS
@@ -40,14 +41,19 @@ const getEndTile = (lastDirection: Direction) => {
 const getTileImg = (map: Map, cell: Cell) => {
   const { lastDirection, startDirection } = map;
   if (cell === Cell.wall) return `<img src="/${TILESET}/solid.png">`
-  if (cell === Cell.start) return `<img src="/${TILESET}/${getStartTile(startDirection!)}.png">`
-  if (cell === Cell.end) return `<img src="/${TILESET}/${getEndTile(lastDirection!)}.png">`
-  if (cell === Cell.horizontal) return `<img src="/${TILESET}/ew.png">`
-  if (cell === Cell.vertical) return `<img src="/${TILESET}/ns.png">`
-  if (cell === Cell.intersection) return `<img src="/${TILESET}/nesw.png">`
-  const [ cellType, directions ] = cell.split('-')
-  if (cellType === 'turn') {
-    return `<img src="/${TILESET}/${directions}.png">`
+
+  if (IS_MAZE) {
+    return `<img src="/${TILESET}/tunnel.png">`
+  } else {
+    if (cell === Cell.start) return `<img src="/${TILESET}/${getStartTile(startDirection!)}.png">`
+    if (cell === Cell.end) return `<img src="/${TILESET}/${getEndTile(lastDirection!)}.png">`
+    if (cell === Cell.horizontal) return `<img src="/${TILESET}/ew.png">`
+    if (cell === Cell.vertical) return `<img src="/${TILESET}/ns.png">`
+    if (cell === Cell.intersection) return `<img src="/${TILESET}/nesw.png">`
+    const [ cellType, directions ] = cell.split('-')
+    if (cellType === 'turn') {
+      return `<img src="/${TILESET}/${directions}.png">`
+    }
   }
 }
 
