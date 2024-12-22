@@ -3,7 +3,7 @@ import { getOppositeDirection } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
 import { find, toNumber, toString } from 'lodash'
 
-const DEFAULT_WAIT_BW_RENDERS = 200; // ms
+const DEFAULT_WAIT_BW_RENDERS = 0; // ms // TODO: reset to 200ish
 const MAX_WAIT = 3000;
 const TILESET = 'labyrinth'
 

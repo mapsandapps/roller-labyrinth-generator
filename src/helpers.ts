@@ -1,5 +1,5 @@
-import { Cell, Direction, Map, Point } from './types';
-import { last, random } from 'lodash';
+import { Cell, Direction, Grid, Map, Point } from './types';
+import { isEqual, last, random, times } from 'lodash';
 
 export const getHorizontal = (direction: Direction) => {
   return (direction === Direction.east || direction === Direction.west)
@@ -21,6 +21,61 @@ export const getOppositeDirection = (direction: Direction): Direction => {
   if (direction === Direction.east) return Direction.west
   if (direction === Direction.west) return Direction.east
   return Direction.north
+}
+
+const getStartOrEndPosition = (grid: Grid, cell: Cell): Point => {
+  for (let y = 0; y < grid.length; y++) {
+    const row = grid[y];
+    const cellIndex = row.indexOf(cell)
+    if (cellIndex > -1) {
+      return { x: cellIndex, y }
+    } 
+  }
+
+  console.warn('no point found!')
+  return { x: -1, y: -1 }
+}
+
+export const trimMap = (map: Map): Map => {
+  const { grid, height, width } = map
+
+  let removedRows = 0
+  let removedColumns = 0
+
+  // loop backwards over rows so if we remove an item from the array, it won't affect the loop
+  for (let i = height - 1; i >= 0; i--) {
+    const row = grid[i];
+
+    if (isEqual(row, times(width, () => Cell.wall))) {
+      grid.splice(i, 1)
+      removedRows++
+    }
+  }
+
+  map.height -= removedRows
+
+  // loop backwards over cols so if we remove an item from the array, it won't affect the loop
+  for (let j = width - 1; j >= 0; j--) {
+    const column = grid.map(row => {
+      return row[j]
+    })
+
+    if (isEqual(column, times(map.height, () => Cell.wall))) {
+      // now loop over rows and delete the cell in that column
+      for (let i = 0; i < map.height; i++) {
+        const row = grid[i];
+        row.splice(j, 1);
+      }
+      removedColumns++
+    }
+    
+  }
+
+  map.width -= removedColumns
+  map.startPosition = getStartOrEndPosition(grid, Cell.start)
+  map.lastPosition = getStartOrEndPosition(grid, Cell.end)
+
+  return map
 }
 
 export const checkDraftMove = (map: Map, draftCells: Point[], isHorizontal: boolean): boolean => {
