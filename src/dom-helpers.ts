@@ -1,5 +1,5 @@
 import { DEFAULT_MAP_WIDTH, DEFAULT_MAP_HEIGHT } from './generation';
-import { getOppositeDirection } from './helpers';
+import { getCellFromPoint, getOppositeDirection } from './helpers';
 import { Cell, Direction, Map, Point } from './types';
 import { find, repeat, toNumber, toString } from 'lodash'
 
@@ -7,6 +7,7 @@ const DEFAULT_WAIT_BW_RENDERS = 200; // ms
 const DEFAULT_IS_MAZE = false;
 const MAX_WAIT = 3000;
 const TILESET = 'labyrinth'
+const RELATIONAL_TILESET = 'small'
 const SHOULD_DRAW_BORDER = true; // add a border of "wall" cells around the whole sprite map
 
 let waitBetweenRenders = DEFAULT_WAIT_BW_RENDERS
@@ -67,6 +68,51 @@ const getTileImg = (map: Map, cell: Cell) => {
 
 export const clearMapWithSprites = () => {
   document.querySelector<HTMLDivElement>('#sprites')!.innerHTML = '';
+}
+
+const getRelationalSpriteName = (map: Map, cellPoint: Point): string => {
+  const { x, y } = cellPoint
+  const isLeftWall = getCellFromPoint(map, { x: x - 1, y }) === Cell.wall
+  const isUpWall = getCellFromPoint(map, { x, y: y - 1 }) === Cell.wall
+  const isUpLeftWall = getCellFromPoint(map, { x: x - 1, y: y - 1 }) === Cell.wall
+
+  if (getCellFromPoint(map, cellPoint) === Cell.wall) return 'Solid'
+
+  if (isLeftWall && isUpLeftWall && isUpWall) return 'UL-L-U'
+  if (isLeftWall && isUpWall) return 'UL-L-U'
+  if (isLeftWall && isUpLeftWall) return 'UL-L'
+  if (isUpLeftWall && isUpWall) return 'UL-U'
+  if (isUpLeftWall) return 'UL'
+  if (isUpWall) return 'U'
+  if (isLeftWall) return 'L'
+
+  return 'Blank'
+}
+
+export const drawMapWithRelationalSprites = (map: Map) => {
+  const { grid, width } = map;
+  const wallTileImg = `<img src="/${RELATIONAL_TILESET}/Solid.png">`
+  let dom = ''
+
+  if (SHOULD_DRAW_BORDER) dom += '<div>' + repeat(wallTileImg, width + 2) + '</div>'
+
+  for (let y = 0; y < grid.length; y++) {
+    const row = grid[y];
+    dom += '<div>'
+    if (SHOULD_DRAW_BORDER) dom += wallTileImg
+
+    for (let x = 0; x < row.length; x++) {
+      // const cell = row[x];
+      dom += `<img src="/${RELATIONAL_TILESET}/${getRelationalSpriteName(map, { x, y })}.png">`
+    }
+
+    if (SHOULD_DRAW_BORDER) dom += wallTileImg
+    dom += '</div>'
+  }
+
+  if (SHOULD_DRAW_BORDER) dom += '<div>' + repeat(wallTileImg, width + 2) + '</div>'
+
+  document.querySelector<HTMLDivElement>('#sprites')!.innerHTML = dom;
 }
 
 export const drawMapWithSprites = (map: Map) => {
@@ -137,7 +183,11 @@ export const drawMapWithDelay = (map: Map, draft?: Point[]): Promise<Map> => {
   drawMap(map, draft);
 
   // draw map with sprites, but only when the move is made, not when it's in draft
-  if (!draft) drawMapWithSprites(map);
+  if (isMaze) {
+    if (!draft) drawMapWithRelationalSprites(map);
+  } else {
+    if (!draft) drawMapWithSprites(map);
+  }
 
   return new Promise((resolve) => setTimeout(() => resolve(map), waitBetweenRenders));
 };

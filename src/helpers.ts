@@ -7,6 +7,7 @@ export const getHorizontal = (direction: Direction) => {
 
 export const getCellFromPoint = (map: Map, point: Point): Cell => {
   const { grid } = map;
+  if (point.y < 0 || point.x < 0) return Cell.wall 
   return grid[point.y][point.x]
 }
 
